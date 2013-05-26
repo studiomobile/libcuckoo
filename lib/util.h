@@ -1,12 +1,11 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-
-#define mutex_lock(mutex) while (pthread_mutex_trylock(mutex));
+#define mutex_lock(mutex) while (pthread_mutex_trylock(mutex)){};
 
 #define mutex_unlock(mutex) pthread_mutex_unlock(mutex)
 
-#define keycmp(p1, p2) (memcmp(p1, p2, sizeof(KeyType)) == 0)
+#define keycmp(p1, p2) (p1->key != NULL && p2->key != NULL && memcmp(p1->key, p2->key, p1->len >= p2->len ? p2->len : p1->len) == 0)
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"

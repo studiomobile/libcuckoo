@@ -1,0 +1,261 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		79EE0FB81746B5C2005AA636 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79EE0FB71746B5C2005AA636 /* Foundation.framework */; };
+		79EE0FD31746B674005AA636 /* city.c in Sources */ = {isa = PBXBuildFile; fileRef = 79EE0FCA1746B674005AA636 /* city.c */; };
+		79EE0FD41746B674005AA636 /* cuckoohash.c in Sources */ = {isa = PBXBuildFile; fileRef = 79EE0FCC1746B674005AA636 /* cuckoohash.c */; };
+		79EE0FDD1746BB51005AA636 /* city.h in Headers */ = {isa = PBXBuildFile; fileRef = 79EE0FCB1746B674005AA636 /* city.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		79EE0FDE1746BB58005AA636 /* cuckoohash.h in Headers */ = {isa = PBXBuildFile; fileRef = 79EE0FCD1746B674005AA636 /* cuckoohash.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		79EE0FE01746BB64005AA636 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 79EE0FD21746B674005AA636 /* util.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		79EE0FB21746B5C2005AA636 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/${PRODUCT_NAME}";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		79EE0FB41746B5C2005AA636 /* liblibcuckoo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibcuckoo.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79EE0FB71746B5C2005AA636 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		79EE0FC51746B674005AA636 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		79EE0FCA1746B674005AA636 /* city.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = city.c; sourceTree = "<group>"; };
+		79EE0FCB1746B674005AA636 /* city.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = city.h; sourceTree = "<group>"; };
+		79EE0FCC1746B674005AA636 /* cuckoohash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cuckoohash.c; sourceTree = "<group>"; };
+		79EE0FCD1746B674005AA636 /* cuckoohash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cuckoohash.h; sourceTree = "<group>"; };
+		79EE0FD21746B674005AA636 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		79EE0FB11746B5C2005AA636 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EE0FB81746B5C2005AA636 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		79EE0FAB1746B5C2005AA636 = {
+			isa = PBXGroup;
+			children = (
+				79EE0FC51746B674005AA636 /* config.h */,
+				79EE0FC61746B674005AA636 /* lib */,
+				79EE0FB61746B5C2005AA636 /* Frameworks */,
+				79EE0FB51746B5C2005AA636 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		79EE0FB51746B5C2005AA636 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				79EE0FB41746B5C2005AA636 /* liblibcuckoo.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79EE0FB61746B5C2005AA636 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				79EE0FB71746B5C2005AA636 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		79EE0FC61746B674005AA636 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				79EE0FCA1746B674005AA636 /* city.c */,
+				79EE0FCB1746B674005AA636 /* city.h */,
+				79EE0FCC1746B674005AA636 /* cuckoohash.c */,
+				79EE0FCD1746B674005AA636 /* cuckoohash.h */,
+				79EE0FD21746B674005AA636 /* util.h */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		79EE0FDC1746BB4E005AA636 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EE0FDD1746BB51005AA636 /* city.h in Headers */,
+				79EE0FDE1746BB58005AA636 /* cuckoohash.h in Headers */,
+				79EE0FE01746BB64005AA636 /* util.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		79EE0FB31746B5C2005AA636 /* libcuckoo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79EE0FC21746B5C2005AA636 /* Build configuration list for PBXNativeTarget "libcuckoo" */;
+			buildPhases = (
+				79EE0FB01746B5C2005AA636 /* Sources */,
+				79EE0FB11746B5C2005AA636 /* Frameworks */,
+				79EE0FB21746B5C2005AA636 /* CopyFiles */,
+				79EE0FDC1746BB4E005AA636 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libcuckoo;
+			productName = libcuckoo;
+			productReference = 79EE0FB41746B5C2005AA636 /* liblibcuckoo.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		79EE0FAC1746B5C2005AA636 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Andrey Verbin";
+			};
+			buildConfigurationList = 79EE0FAF1746B5C2005AA636 /* Build configuration list for PBXProject "libcuckoo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 79EE0FAB1746B5C2005AA636;
+			productRefGroup = 79EE0FB51746B5C2005AA636 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				79EE0FB31746B5C2005AA636 /* libcuckoo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		79EE0FB01746B5C2005AA636 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EE0FD31746B674005AA636 /* city.c in Sources */,
+				79EE0FD41746B674005AA636 /* cuckoohash.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		79EE0FC01746B5C2005AA636 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		79EE0FC11746B5C2005AA636 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		79EE0FC31746B5C2005AA636 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/libcuckoo.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		79EE0FC41746B5C2005AA636 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/libcuckoo.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		79EE0FAF1746B5C2005AA636 /* Build configuration list for PBXProject "libcuckoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79EE0FC01746B5C2005AA636 /* Debug */,
+				79EE0FC11746B5C2005AA636 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79EE0FC21746B5C2005AA636 /* Build configuration list for PBXNativeTarget "libcuckoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79EE0FC31746B5C2005AA636 /* Debug */,
+				79EE0FC41746B5C2005AA636 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 79EE0FAC1746B5C2005AA636 /* Project object */;
+}

@@ -9,7 +9,9 @@
  *
  */
 
+#include "config.h"
 #include "cuckoohash.h"
+
 
 /*
  * default hash table size
@@ -35,8 +37,8 @@
  */
 #define bucketsize 4
 typedef struct {
-    KeyType keys[bucketsize];
-    ValType vals[bucketsize];
+    cuckoo_key_t keys[bucketsize];
+    void *vals[bucketsize];
 }  __attribute__((__packed__))
 Bucket;
 
@@ -67,8 +69,8 @@ Bucket;
     __sync_fetch_and_add(&((uint32_t*) h->keyver_array)[idx & keyver_mask], 1); \
     } while(0)
 
-static inline  uint32_t _hashed_key(const char* key) {
-    return CityHash32(key, sizeof(KeyType));
+static inline  uint32_t _hashed_key(const cuckoo_key_t* key) {
+    return CityHash32(key->key, key->len);
 }
 
 #define hashsize(n) ((uint32_t) 1 << n)
@@ -125,7 +127,7 @@ static inline size_t _lock_index(const uint32_t hv) {
 static inline bool is_slot_empty(cuckoo_hashtable_t* h,
                                  size_t i,
                                  size_t j) {
-    if (TABLE_KEY(h, i, j)==0)
+    if (TABLE_KEY(h, i, j).key == NULL)
         return true;
     return false;
 }
@@ -135,7 +137,7 @@ static inline bool is_slot_empty(cuckoo_hashtable_t* h,
 typedef struct  {
     size_t buckets[NUM_CUCKOO_PATH];
     size_t slots[NUM_CUCKOO_PATH];
-    KeyType keys[NUM_CUCKOO_PATH];
+    cuckoo_key_t keys[NUM_CUCKOO_PATH];
 }  __attribute__((__packed__))
 CuckooRecord;
 
@@ -182,7 +184,7 @@ static int _cuckoopath_search(cuckoo_hashtable_t* h,
             j = rand() % bucketsize;
             curr->slots[idx] = j;
             curr->keys[idx]  = TABLE_KEY(h, i, j);
-            uint32_t hv = _hashed_key((char*) &TABLE_KEY(h, i, j));
+            uint32_t hv = _hashed_key(&TABLE_KEY(h, i, j));
             next->buckets[idx] = _alt_index(h, hv, i);
         }
 
@@ -218,22 +220,25 @@ static int _cuckoopath_move(cuckoo_hashtable_t* h,
          * there's a small chance we've gotten scooped by a later cuckoo.
          * If that happened, just... try again.
          */
-        if (!keycmp((char*) &TABLE_KEY(h, i1, j1), (char*) &(from->keys[idx]))) {
+        cuckoo_key_t *key1 = &TABLE_KEY(h, i1, j1);
+        cuckoo_key_t *key2 = &from->keys[idx];
+        if (!keycmp(key1, key2)) {
             /* try again */
             return depth;
         }
 
         assert(is_slot_empty(h, i2, j2));
 
-        uint32_t hv = _hashed_key((char*) &TABLE_KEY(h, i1, j1));
+        uint32_t hv = _hashed_key(key1);
         size_t keylock   = _lock_index(hv);
 
         start_incr_keyver(h, keylock);
 
-        TABLE_KEY(h, i2, j2) = TABLE_KEY(h, i1, j1);
+        TABLE_KEY(h, i2, j2) = *key1;
         TABLE_VAL(h, i2, j2) = TABLE_VAL(h, i1, j1);
-        TABLE_KEY(h, i1, j1) = 0;
-        TABLE_VAL(h, i1, j1) = 0;
+        key1->key = NULL;
+        key1->len = 0;
+        TABLE_VAL(h, i1, j1) = NULL;
 
         end_incr_keyver(h, keylock);
 
@@ -286,15 +291,14 @@ static int _run_cuckoo(cuckoo_hashtable_t* h,
  * @return true if key is found, false otherwise
  */
 static bool _try_read_from_bucket(cuckoo_hashtable_t* h,
-                                  const char *key,
-                                  char *val,
+                                  const cuckoo_key_t *key,
+                                  void **val,
                                   size_t i) {
     size_t  j;
     for (j = 0; j < bucketsize; j ++) {
-
-        if (keycmp((char*) &TABLE_KEY(h, i, j), key)) {
-
-            memcpy(val, (char*) &TABLE_VAL(h, i, j), sizeof(ValType));
+        cuckoo_key_t *existing_key = &TABLE_KEY(h, i, j);
+        if (keycmp(existing_key, key)) {
+            *val = TABLE_VAL(h, i, j);
             return true;
         }
     }
@@ -312,8 +316,8 @@ static bool _try_read_from_bucket(cuckoo_hashtable_t* h,
  * @return true on success and false on failure
  */
 static bool _try_add_to_bucket(cuckoo_hashtable_t* h,
-                               const char* key,
-                               const char* val,
+                               const cuckoo_key_t* key,
+                               const void* val,
                                size_t i,
                                size_t keylock) {
     size_t j;
@@ -321,9 +325,14 @@ static bool _try_add_to_bucket(cuckoo_hashtable_t* h,
         if (is_slot_empty(h, i, j)) {
 
             start_incr_keyver(h, keylock);
-
-            memcpy(&TABLE_KEY(h, i, j), key, sizeof(KeyType));
-            memcpy(&TABLE_VAL(h, i, j), val, sizeof(ValType));
+            cuckoo_key_t *table_key = &TABLE_KEY(h, i, j);
+            if (table_key->key != NULL) {
+                free((void*)table_key->key);
+            }
+            table_key->len = key->len;
+            table_key->key = malloc(table_key->len);
+            memcpy((void*)table_key->key, key->key, table_key->len);
+            TABLE_VAL(h, i, j) = (void*)val;
 
             h->hashitems ++;
 
@@ -347,18 +356,21 @@ static bool _try_add_to_bucket(cuckoo_hashtable_t* h,
  * @return true if key is found, false otherwise
  */
 static bool _try_del_from_bucket(cuckoo_hashtable_t* h,
-                                 const char*key,
+                                 const cuckoo_key_t*key,
                                  size_t i,
                                  size_t keylock) {
     size_t j;
     for (j = 0; j < bucketsize; j ++) {
 
-        if (keycmp((char*) &TABLE_KEY(h, i, j), key)) {
+        cuckoo_key_t *tbl_key = &TABLE_KEY(h, i, j);
+        if (keycmp(tbl_key, key)) {
 
             start_incr_keyver(h, keylock);
-
-            TABLE_KEY(h, i, j) = 0;
-            TABLE_VAL(h, i, j) = 0;
+            free((void*)tbl_key->key);
+            tbl_key->key = NULL;
+            tbl_key->len = 0;
+            
+            TABLE_VAL(h, i, j) = NULL;
             /* buckets[i].keys[j] = 0; */
             /* buckets[i].vals[j] = 0; */
 
@@ -384,8 +396,8 @@ static bool _try_del_from_bucket(cuckoo_hashtable_t* h,
  * @return
  */
 static cuckoo_status _cuckoo_find(cuckoo_hashtable_t* h,
-                                  const char *key,
-                                  char *val,
+                                  const cuckoo_key_t *key,
+                                  void **val,
                                   size_t i1,
                                   size_t i2,
                                   size_t keylock) {
@@ -412,8 +424,8 @@ TryRead:
 }
 
 static cuckoo_status _cuckoo_insert(cuckoo_hashtable_t* h,
-                                    const char* key,
-                                    const char* val,
+                                    const cuckoo_key_t* key,
+                                    const void* val,
                                     size_t i1,
                                     size_t i2,
                                     size_t keylock) {
@@ -450,7 +462,7 @@ static cuckoo_status _cuckoo_insert(cuckoo_hashtable_t* h,
 }
 
 static cuckoo_status _cuckoo_delete(cuckoo_hashtable_t* h,
-                                    const char* key,
+                                    const cuckoo_key_t* key,
                                     size_t i1,
                                     size_t i2,
                                     size_t keylock) {
@@ -472,13 +484,13 @@ cuckoo_hashtable_t* cuckoo_init(const int hashtable_init) {
     cuckoo_hashtable_t* h = (cuckoo_hashtable_t*) malloc(sizeof(cuckoo_hashtable_t));
     if (!h)
         goto Cleanup;
-
+    
     h->hashpower  = (hashtable_init > 0) ? hashtable_init : HASHPOWER_DEFAULT;
     h->hashitems  = 0;
     h->kick_count = 0;
     pthread_mutex_init(&h->lock, NULL);
 
-    h->buckets = malloc(hashsize(h->hashpower) * sizeof(Bucket));
+    h->buckets = calloc(hashsize(h->hashpower), sizeof(Bucket));
     if (! h->buckets) {
         fprintf(stderr, "Failed to init hashtable.\n");
         goto Cleanup;
@@ -522,8 +534,8 @@ cuckoo_status cuckoo_exit(cuckoo_hashtable_t* h) {
 }
 
 cuckoo_status cuckoo_find(cuckoo_hashtable_t* h,
-                          const char *key,
-                          char *val) {
+                          const cuckoo_key_t *key,
+                          void **val) {
 
     uint32_t hv    = _hashed_key(key);
     size_t i1      = _index_hash(h, hv);
@@ -532,28 +544,22 @@ cuckoo_status cuckoo_find(cuckoo_hashtable_t* h,
 
     cuckoo_status st = _cuckoo_find(h, key, val, i1, i2, keylock);
 
-    if (st == failure_key_not_found) {
-        DBG("miss for key %u i1=%zu i2=%zu\n", *((KeyType*) key), i1, i2);
-    }
-
     return st;
 }
 
 cuckoo_status cuckoo_insert(cuckoo_hashtable_t* h,
-                            const char *key,
-                            const char* val) {
-
+                            const cuckoo_key_t *key,
+                            void* val) {
     uint32_t hv = _hashed_key(key);
     size_t i1   = _index_hash(h, hv);
     size_t i2   = _alt_index(h, hv, i1);
     size_t keylock = _lock_index(hv);
 
-    ValType oldval;
+    void *oldval;
     cuckoo_status st;
 
     mutex_lock(&h->lock);
-
-    st = _cuckoo_find(h, key, (char*) &oldval, i1, i2, keylock);
+    st = _cuckoo_find(h, key, &oldval, i1, i2, keylock);
     if  (st == ok) {
         mutex_unlock(&h->lock);
         return failure_key_duplicated;
@@ -567,7 +573,7 @@ cuckoo_status cuckoo_insert(cuckoo_hashtable_t* h,
 }
 
 cuckoo_status cuckoo_delete(cuckoo_hashtable_t* h,
-                            const char *key) {
+                            const cuckoo_key_t *key) {
 
     uint32_t hv = _hashed_key(key);
     size_t i1   = _index_hash(h, hv);

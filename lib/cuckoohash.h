@@ -15,9 +15,6 @@
 #include <pthread.h>
 
 
-
-#include "config.h"
-#include "cuckoohash_config.h"
 //#include "hash.h"
 #include "city.h"
 #include "util.h"
@@ -69,7 +66,10 @@ typedef struct {
 
 } cuckoo_hashtable_t;
 
-
+typedef struct {
+    const void *key;
+    size_t len;
+} cuckoo_key_t;
 
 /** 
  * @brief Initialize the hash table
@@ -94,13 +94,15 @@ cuckoo_status cuckoo_exit(cuckoo_hashtable_t* h);
  * @param h handler to the hash table
  *
  * @param key key to search 
+ * @param keySize size of the key
  * @param val value to return
+ * @param valSize size of the value
  * 
  * @return ok if key is found, not_found otherwise
  */
-cuckoo_status cuckoo_find(cuckoo_hashtable_t* h, const char *key, char *val);
-
-
+cuckoo_status cuckoo_find(cuckoo_hashtable_t* h,
+                          const cuckoo_key_t *key,
+                          void **val);
 
 /** 
  * @brief Insert key/value to cuckoo hash table
@@ -115,7 +117,9 @@ cuckoo_status cuckoo_find(cuckoo_hashtable_t* h, const char *key, char *val);
  * 
  * @return ok if key/value are succesfully inserted
  */
-cuckoo_status cuckoo_insert(cuckoo_hashtable_t* h, const char *key, const char* val);
+cuckoo_status cuckoo_insert(cuckoo_hashtable_t* h,
+                            const cuckoo_key_t *key,
+                            void* val);
 
 
 /** 
@@ -126,7 +130,7 @@ cuckoo_status cuckoo_insert(cuckoo_hashtable_t* h, const char *key, const char* 
  *
  * @return ok if key is succesfully deleted, not_found if the key is not present
  */
-cuckoo_status cuckoo_delete(cuckoo_hashtable_t* h, const char *key);
+cuckoo_status cuckoo_delete(cuckoo_hashtable_t* h, const cuckoo_key_t *key);
 
 
 /** 
